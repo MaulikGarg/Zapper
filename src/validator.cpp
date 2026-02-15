@@ -1,13 +1,9 @@
 #include "validator.h"
 
-void resolve_source_file(const fs::path& source, fs::file_status& source_info) {
+void resolve_source(const fs::path& source, fs::file_status& source_info) {
 	source_info = fs::status(source);
-
 	if (!fs::exists(source_info))
 		throw std::runtime_error("Source path does not exist.");
-
-	if (!fs::is_regular_file(source_info))
-		throw std::runtime_error("Expected a file in source path.");
 }
 
 void resolve_destination_file(const fs::path& source, fs::path& destination, const fs::file_status& source_info, fs::file_status& destination_info) {
@@ -33,4 +29,8 @@ void resolve_destination_file(const fs::path& source, fs::path& destination, con
 		if (!fs::is_directory(parent_status))
 			throw std::runtime_error("Parent path is not a directory.");
 	}
+}
+
+void resolve_destination_directory_root(const fs::path& source, fs::path& destination, fs::file_status& destination_info){
+	
 }
