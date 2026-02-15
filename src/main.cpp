@@ -4,6 +4,7 @@
 
 #include "copyengine.h"
 #include "validator.h"
+#include "ioprocess.h"
 
 namespace fs = std::filesystem;
 
@@ -12,20 +13,19 @@ void get_destination(fs::path& destination_path);
 
 int main() {
 	try {
-		fs::path source, destination;
-		fs::file_status source_info, destination_info;
+		IO_process mainprocess; // every operation is a process in itself
 
 		std::cout << "File Zap 0.01\n";
 
-		get_source(source);
-		resolve_source(source, source_info);
-		get_destination(destination);
+		get_source(mainprocess);
+		resolve_source(mainprocess);
+		get_destination(mainprocess);
 
-		if (fs::is_regular_file(source_info)) {
-			resolve_destination_file(source, destination, source_info, destination_info);
-			copy_file_engine(source, destination);
-		} else if (fs::is_directory(source_info)) {
-			resolve_destination_directory_root(source, destination, destination_info);
+		if (fs::is_regular_file(mainprocess.source_info)) {
+			resolve_destination_file(mainprocess);
+			copy_file_engine(mainprocess);
+		} else if (fs::is_directory(mainprocess.source_info)) {
+			resolve_destination_directory_root(mainprocess);
 		} else
 			throw std::runtime_error("Unsupported format.");
 
@@ -37,16 +37,16 @@ int main() {
 	}
 }
 
-void get_source(fs::path& source_path) {
+void get_source(IO_process& process) {
 	std::string source_inp;
 	std::cout << "Enter the source file path: ";
 	getline(std::cin, source_inp);
-	source_path = source_inp;
+	process.source = source_inp;
 }
 
-void get_destination(fs::path& destination_path) {
+void get_destination(IO_process& process) {
 	std::string destination_inp;
 	std::cout << "Enter the destination file path: ";
 	getline(std::cin, destination_inp);
-	destination_path = destination_inp;
+	process.destination = destination_inp;
 }
