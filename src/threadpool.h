@@ -1,6 +1,7 @@
 #ifndef THREAD_POOL_H
 #define THREAD_POOL_H
 
+#include "copyengine.h"
 #include "ioprocess.h"
 #include "utility.h"
 #include <condition_variable>
@@ -9,6 +10,8 @@
 #include <mutex>
 #include <queue>
 #include <vector>
+
+#define MAX_THREADS 8
 
 class ThreadPool{
     // the primary thread pool
