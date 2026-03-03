@@ -10,7 +10,7 @@
 #include <queue>
 #include <vector>
 
-#define MAX_THREADS 8
+constexpr int MAX_THREADS =  8;
 
 void copy_file_engine(IO_process &process);
 
@@ -42,7 +42,7 @@ class ThreadPool{
         // , sets m_WorkComplete and joins all threads
         void shutdown();
         // returns the exception vector
-        std::vector<std::exception_ptr> get_errors() const {
+        const std::vector<std::exception_ptr>& get_errors() const {
             return m_exceptions;
         }
     private:

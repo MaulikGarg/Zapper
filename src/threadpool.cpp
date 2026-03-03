@@ -12,6 +12,7 @@ ThreadPool::ThreadPool() {
 
 // simple destructor to CALL UPON DESTRUCTION!!
 ThreadPool::~ThreadPool() {
+	if(m_WorkComplete) return;
 	shutdown();
 }
 
