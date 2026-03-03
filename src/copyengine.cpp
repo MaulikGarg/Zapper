@@ -1,7 +1,6 @@
 #include "copyengine.h"
+#include "threadpool.h"
 
-#include "ioprocess.h"
-#include "utility.h"
 namespace fs = std::filesystem;
 // the primary copy engine for copying a single file around
 // the IO_Process sent must have its source and destination values
@@ -54,7 +53,7 @@ void copy_file_engine(IO_process& process) {
 // the primary copy engine for copying directories around.
 // the IO_Process sent must have directories as source and destination.
 // ! this function does not validate sent addresses.
-void copy_directory_engine(IO_process& process) {
+void copy_directory_engine(IO_process& process, ThreadPool& pool) {
 	std::string context = "In copy_directory_engine()";
 
 	// iterate through all the directories and select current object as "src"
@@ -70,13 +69,12 @@ void copy_directory_engine(IO_process& process) {
 
 		// if src is a file, copy using file engine
 		if (src.is_regular_file()) {
-			copy_file_engine(current);
-
+			pool.add_process(current);
 			// if src is a directory, make that directory at destination then copy it recursively
 		} else if (src.is_directory()) {
 			if (mkdir(current.m_destination.c_str(), current.m_source_info.st_mode & 0777) != 0)
 				throw_errno(context + ", mkdir on: " + current.m_destination.c_str());
-			copy_directory_engine(current);	// copies the directory's contents
+			copy_directory_engine(current, pool);	// copies the directory's contents
 		}
 	}
 }

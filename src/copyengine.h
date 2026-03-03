@@ -3,6 +3,7 @@
 
 #include <unistd.h>	//for close, write
 #include "ioprocess.h"
+#include "threadpool.h"
 #include "utility.h"
 #include "validator.h"
 
@@ -13,5 +14,5 @@ void copy_file_engine(IO_process& process);
 
 // copies an entire directory
 // the destination directory root must exist
-void copy_directory_engine(IO_process& process);
+void copy_directory_engine(IO_process& process, ThreadPool& pool);
 #endif

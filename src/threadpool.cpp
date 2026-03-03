@@ -1,4 +1,5 @@
 #include "threadpool.h"
+#include "ioprocess.h"
 
 // creates MAX_THREADS number of threads and locks em in the worker_loop
 ThreadPool::ThreadPool() {
@@ -32,39 +33,45 @@ void ThreadPool::shutdown() {
 	m_WorkComplete = true;
 	m_mutex.unlock();
 	m_controller.notify_all();
+	for (auto& i : m_threads) {
+		if (i.joinable())
+			i.join();
+	}
 }
 
 // the main worker loop, puts a thread to sleep and awakes when a job is here
 void ThreadPool::worker_loop() {
+	IO_process job;
 	while (true) {
-		// lock to be used
-		std::unique_lock<std::mutex> lock(m_mutex);
+		// braces represent where the unique lock would be present
+		{
+			// lock to be used
+			std::unique_lock<std::mutex> lock(m_mutex);
 
-		// * The Controller Condition makes the current executing thread wait until,
-		// * Either the m_process queue is completely empty or,
-		// * the pool will not be receiving any more job
-		m_controller.wait(lock, [this] { return !m_processes.empty() || m_WorkComplete; });
+			// * The Controller Condition makes the current executing thread wait until,
+			// * Either the m_process queue is completely empty or,
+			// * the pool will not be receiving any more job
+			// * It should be noted that that wait() would release the lock
+			m_controller.wait(lock, [this] { return !m_processes.empty() || m_WorkComplete; });
 
-		// if no work is present AND none will ever come, return
-		if (m_processes.empty() && m_WorkComplete)
-			return;
+			// if no work is present AND none will ever come, return
+			if (m_processes.empty() && m_WorkComplete)
+				return;
 
-		m_mutex.lock();
-		// quickly move the job to a local IO Process struct
-		IO_process job = std::move(m_processes.front());
-		// pop the job off the queue
-		m_processes.pop();
-		m_mutex.unlock();
-
-        // TRY to copy the given file
+			// quickly move the job to a local IO Process struct
+			job = std::move(m_processes.front());
+			// pop the job off the queue
+			m_processes.pop();
+		}
+		// TRY to copy the given file
 		try {
 			copy_file_engine(job);
 		}
-        // If any error is thrown, store it in the errors vector and WE CONTINUE!
-        catch(std::exception& e){
-            m_error_mutex.lock();
-            m_exceptions.push_back(std::current_exception());
-            m_error_mutex.unlock();
-        }
+		// If any error is thrown, store it in the errors vector and WE CONTINUE!
+		catch (std::exception& e) {
+			m_error_mutex.lock();
+			m_exceptions.push_back(std::current_exception());
+			m_error_mutex.unlock();
+		}
 	}
 }
