@@ -16,13 +16,15 @@ This is a student project.
 
 - Prevents accidental overwrites
 - Copies a single file
-- Copies directories in a single thread 
+- Copies directories in a 8 threads
+- Symlink prevention
+- Shows errors at directory transfer end 
 
 ## Current TO-DO
 
-- Reject symlinks
-- Implement a thread pool for directory copying
 - Implement same st_dev atomic rename
+- Implement a delete function 
+- Implement moving using the copy and deletion engines
 
 ## Short Term Planned Features
 

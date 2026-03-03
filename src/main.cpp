@@ -81,7 +81,7 @@ int main(int argc, char* argv[]) {
 					try {
 						// rethrow the current exception so the relative catch block can print it
 						std::rethrow_exception(err);
-					} catch (std::exception e) {
+					} catch (std::exception& e) {
 						std::cerr << e.what() << '\n';
 					}
 			}
