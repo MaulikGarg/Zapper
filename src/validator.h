@@ -1,5 +1,4 @@
-#ifndef VALIDATOR_H
-#define VALIDATOR_H
+#pragma once
 
 #include "ioprocess.h"
 #include "utility.h"
@@ -23,4 +22,4 @@ void resolve_destination_directory_root(IO_process& process);
 
 // validates if the parent of a destination directory exists.
 void resolve_destination_parent(IO_process& destination);
-#endif
+

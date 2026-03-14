@@ -1,5 +1,5 @@
-#ifndef UTILS_H
-#define UTILS_H
+#pragma once
+
 #include <cerrno>
 #include <cstring>
 #include <stdexcept>
@@ -17,5 +17,3 @@ inline void throw_errno(const std::string& context = "") {
 	std::string msg = context.empty() ? std::strerror(errno) : context + ": " + std::strerror(errno);
 	throw std::runtime_error(msg);
 }
-
-#endif

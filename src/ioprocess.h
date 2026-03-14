@@ -1,5 +1,4 @@
-#ifndef IOPROCESS_H
-#define IOPROCESS_H
+#pragma once
 
 #include <fcntl.h>
 #include <unistd.h>
@@ -45,4 +44,3 @@ class IO_process {
 	}
 };
 
-#endif

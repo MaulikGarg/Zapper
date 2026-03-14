@@ -1,5 +1,4 @@
-#ifndef COPY_ENGINE_H
-#define COPY_ENGINE_H
+#pragma once
 
 #include <unistd.h>	//for close, write
 #include "ioprocess.h"
@@ -24,4 +23,4 @@ void move_file_engine(IO_process& process);
 // if same st_dev, simply renames.
 // otherwise, calls copy_directory_engine, main() is responsible for deleting source
 void move_directory_engine(IO_process& process, ThreadPool& pool);
-#endif
+

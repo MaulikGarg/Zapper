@@ -1,5 +1,4 @@
-#ifndef THREAD_POOL_H
-#define THREAD_POOL_H
+#pragma once
 
 #include "ioprocess.h"
 #include "utility.h"
@@ -53,5 +52,3 @@ class ThreadPool{
         // IO Processes to be performed
         void worker_loop();
 };
-
-#endif

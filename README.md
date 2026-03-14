@@ -19,21 +19,7 @@ This is a student project.
 - Copies directories in a 8 threads
 - Symlink prevention
 - Shows errors at directory transfer end 
-
-## Current TO-DO
-
-- Implement same st_dev atomic rename
-- Implement a delete function 
-- Implement moving using the copy and deletion engines
-
-## Short Term Planned Features
-
-- Directory copying
-- File moving
-- Directory moving
-- Multiple threads on all operations
-- Progress Tracking
-
+- Moves files/directories
 
 ## Build Instructions
 
