@@ -62,10 +62,17 @@ int main(int argc, char* argv[]) {
 			ThreadPool mainpool;
 			resolve_destination_directory_root(mainprocess);
 
-			if (process == copy)
+			if (process == copy) {
+				// set total bytes to be transferred
+				mainpool.set_total_bytes(calculate_total_bytes(mainprocess.m_source));
 				copy_directory_engine(mainprocess, mainpool);
-			else if (process == move)
+
+			} else if (process == move) {
+				// if the move is to a different device, calculates bytes to be moved
+				if (!mainprocess.m_same_device)
+					mainpool.set_total_bytes(calculate_total_bytes(mainprocess.m_source));
 				move_directory_engine(mainprocess, mainpool);
+			}
 
 			// shut down all threads that mainpool may have opened
 			mainpool.shutdown();
@@ -87,7 +94,7 @@ int main(int argc, char* argv[]) {
 				if (errors.empty())
 					std::filesystem::remove_all(mainprocess.m_source);
 				else
-				 	std::cerr << "Move incomplete, source not deleted due to errors.\n";
+					std::cerr << "Move incomplete, source not deleted due to errors.\n";
 			}
 		}
 		// if the source is not a file or a directory
@@ -110,12 +117,14 @@ void get_path(IO_process& process, e_whichpath path, std::string arg) {
 	if (!arg.empty())
 		input = arg;
 	else {
-		if (path == source) {
-			std::cout << "Enter the source file path: ";
+		switch (path) {
+			case source:
+				std::cout << "Enter the source file path: ";
+				break;
+			case destination:
+				std::cout << "Enter the destination file path: ";
+				break;
 		}
-		if (path == destination)
-			std::cout << "Enter the destination file path: ";
-
 		getline(std::cin, input);
 	}
 

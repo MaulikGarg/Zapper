@@ -3,6 +3,7 @@
 #include <unistd.h>
 
 #include <cerrno>
+#include <cstdint>
 #include <cstdio>
 #include <filesystem>
 
@@ -89,19 +90,26 @@ void copy_directory_engine(IO_process& process, ThreadPool& pool) {
 		current.m_destination = process.m_destination / src.path().filename();
 		// since the child will have the same drive as destination parent
 		current.m_same_device = process.m_same_device;
-		// stat the source to obtain permissions
-		if (stat(current.m_source.c_str(), &current.m_source_info) == -1)
-			throw_errno(context + " , stat on: " + current.m_source.c_str());
 
 		// if src is a file, copy using file engine
 		if (src.is_regular_file()) {
+			// stat the source to obtain permissions
+			if (stat(current.m_source.c_str(), &current.m_source_info) == -1)
+				throw_errno(context + " , stat on: " + current.m_source.c_str());
 			pool.add_process(current);
+
+
 			// if src is a directory, make that directory at destination then copy it recursively
 		} else if (src.is_directory()) {
+			// stat the source to obtain permissions
+			if (stat(current.m_source.c_str(), &current.m_source_info) == -1)
+				throw_errno(context + " , stat on: " + current.m_source.c_str());
 			if (mkdir(current.m_destination.c_str(), current.m_source_info.st_mode & 0777) != 0)
 				throw_errno(context + ", mkdir on: " + current.m_destination.c_str());
 			// copies the directory's contents
 			copy_directory_engine(current, pool);
+
+
 		} else if (src.is_symlink()) {
 			// if its a symlink, simply skip
 			std::cerr << "Skipping symlink: " << src.path() << '\n';
@@ -135,4 +143,14 @@ void move_directory_engine(IO_process& process, ThreadPool& pool) {
 		// * It must be done in main() AFTER shutdown()
 		copy_directory_engine(process, pool);
 	}
+}
+
+uint64_t calculate_total_bytes(std::filesystem::path& path) {
+	static std::string context = "In calculate_total_bytes()";
+	uint64_t bytes{0};
+	for (const fs::directory_entry& current : fs::recursive_directory_iterator(path)) {
+		if (current.is_regular_file())
+			bytes += current.file_size();
+	}
+	return bytes;
 }

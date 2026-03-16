@@ -7,12 +7,30 @@ ThreadPool::ThreadPool() {
 		// used "this" as ThreadPool::worker_loop() is a memfunc
 		m_threads.emplace_back(std::thread(&ThreadPool::worker_loop, this));
 	}
+
+	// create a seperate thread responsible for progress display
+
+	auto progress_update = [this]() {
+		while (!m_WorkComplete) {
+			// updates every PROGRESS_UPDATE_INTERVAL seconds
+			std::this_thread::sleep_for(std::chrono::milliseconds(PROGRESS_UPDATE_INTERVAL));
+			if (m_totalBytes) {
+				int percentage = (m_bytesCompleted.load() / m_totalBytes) * 100;
+				std::cout << "\rProgress: " << percentage << "% " << std::flush;
+			}
+		}
+		std::cout << "\rProgress: 100% \n"
+					 << std::flush;
+	};
+
+	m_threads.emplace_back(std::thread(progress_update));
 }
 
 // simple destructor to CALL UPON DESTRUCTION!!
 ThreadPool::~ThreadPool() {
 	// if work is already complete, do not call shutdown
-	if(m_WorkComplete) return;
+	if (m_WorkComplete)
+		return;
 	shutdown();
 }
 
@@ -67,8 +85,8 @@ void ThreadPool::worker_loop() {
 		// TRY to copy the given file
 		try {
 			copy_file_engine(job);
-			int current = m_completed++;
-			std::cout << "\rCopied: " << current << std::flush;
+			// we use memory order relaxed as addition order does not matter
+			m_bytesCompleted.fetch_add(job.m_source_info.st_size, std::memory_order_relaxed);
 		}
 		// If any error is thrown, store it in the errors vector and WE CONTINUE!
 		catch (std::exception& e) {

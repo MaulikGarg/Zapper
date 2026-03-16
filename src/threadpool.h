@@ -4,13 +4,16 @@
 #include "utility.h"
 #include <atomic>
 #include <condition_variable>
+#include <cstdint>
 #include <thread>
 #include <mutex>
 #include <queue>
 #include <vector>
 #include <iostream>
+#include <chrono>
 
 constexpr int MAX_THREADS =  8;
+constexpr int PROGRESS_UPDATE_INTERVAL = 50; // in ms
 
 void copy_file_engine(IO_process &process);
 
@@ -29,8 +32,10 @@ class ThreadPool{
     std::mutex m_error_mutex;
     // flag to indicate all work is complete
     bool m_WorkComplete {false};
-    // progress tracker
-    std::atomic<int> m_completed {};
+    // the total number of bytes to be moved, used for progress bar
+    uint64_t m_totalBytes {};
+    // the number of bytes that have been completed so far
+    std::atomic<uint64_t> m_bytesCompleted {};
 
     public:
         // primary constructor, creates all threads and puts
@@ -47,6 +52,8 @@ class ThreadPool{
         const std::vector<std::exception_ptr>& get_errors() const {
             return m_exceptions;
         }
+        // set the total bytes to transfer
+        void set_total_bytes(uint64_t n){m_totalBytes = n;}
     private:
         // the function ran by each thread as it loops awaiting for 
         // IO Processes to be performed

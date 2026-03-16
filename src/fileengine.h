@@ -5,6 +5,8 @@
 #include "threadpool.h"
 #include "utility.h"
 #include "validator.h"
+#include <cstdint>
+#include <filesystem>
 #include <iostream>
 constexpr int max_read_size = 1'048'576;	// 1mb i/o size
 
@@ -24,3 +26,5 @@ void move_file_engine(IO_process& process);
 // otherwise, calls copy_directory_engine, main() is responsible for deleting source
 void move_directory_engine(IO_process& process, ThreadPool& pool);
 
+// walks a directory tree and returns the total size of its contents in bytes
+uint64_t calculate_total_bytes(std::filesystem::path& path);

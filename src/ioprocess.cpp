@@ -1,4 +1,7 @@
 #include "ioprocess.h"
+
+#include <fcntl.h>
+#include <cerrno>
 // closes both source and destination file descriptors of an
 // IO_process
 void IO_process::cleanup() {
@@ -34,10 +37,15 @@ void IO_process::finalize() {
 void IO_process::open_files() {
 	std::string context = "In open_files()";
 	// open the source file descriptor with read only flag
-	m_source_fd = open(m_source.c_str(), O_RDONLY);
-	// if its a bad file descriptor
-	if (m_source_fd < 0)
+	m_source_fd = open(m_source.c_str(), O_RDONLY | O_NOATIME);
+	// if its a bad file descriptor because of permission error (O_NOATIME) try again without
+	if(m_source_fd < 0 && errno == EPERM){
+		m_source_fd = open(m_source.c_str(), O_RDONLY);
+	}
+	// if its still a bad file descriptor
+	if (m_source_fd < 0) {
 		throw_errno(context + ", failed to open source_fd for source: " + m_source.c_str());
+	}
 
 	// calculate the path for the temporary file
 	m_temp = m_destination.parent_path() / ("." + m_destination.filename().string() + ".bf.tmp");
