@@ -30,6 +30,8 @@ class ThreadPool{
     std::vector<std::exception_ptr> m_exceptions;
     // the mutex for locking the exceptions vector
     std::mutex m_error_mutex;
+    // flag to indicate all work is sent
+    bool m_WorkSent {false};
     // flag to indicate all work is complete
     bool m_WorkComplete {false};
     // the total number of bytes to be moved, used for progress bar

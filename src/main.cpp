@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
 	std::string flag{};
 
 	try {
-		std::cout << "File Zap 0.3\n";
+		std::cout << "Byteflux v0.6\n";
 
 		if (argc == 4) {
 			get_path(mainprocess, source, argv[2]);

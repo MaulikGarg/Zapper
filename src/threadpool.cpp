@@ -15,7 +15,7 @@ ThreadPool::ThreadPool() {
 			// updates every PROGRESS_UPDATE_INTERVAL seconds
 			std::this_thread::sleep_for(std::chrono::milliseconds(PROGRESS_UPDATE_INTERVAL));
 			if (m_totalBytes) {
-				int percentage = (m_bytesCompleted.load() / m_totalBytes) * 100;
+				int percentage = ((double)(m_bytesCompleted.load()) / m_totalBytes) * 100;
 				std::cout << "\rProgress: " << percentage << "% " << std::flush;
 			}
 		}
@@ -29,7 +29,7 @@ ThreadPool::ThreadPool() {
 // simple destructor to CALL UPON DESTRUCTION!!
 ThreadPool::~ThreadPool() {
 	// if work is already complete, do not call shutdown
-	if (m_WorkComplete)
+	if (m_WorkSent)
 		return;
 	shutdown();
 }
@@ -49,13 +49,18 @@ void ThreadPool::add_process(IO_process process) {
 // shuts down everything and joins the threads
 void ThreadPool::shutdown() {
 	m_mutex.lock();
-	m_WorkComplete = true;
+	m_WorkSent = true;
 	m_mutex.unlock();
 	m_controller.notify_all();
-	for (auto& i : m_threads) {
-		if (i.joinable())
-			i.join();
+	// join all file operation threads
+	for (int i = 0; i < MAX_THREADS; i++) {
+		if(m_threads[i].joinable()) m_threads[i].join(); 
 	}
+	
+	// now that all work is actually complete
+	m_WorkComplete = true;
+	// join the progress thread now that all work is done
+	if(m_threads[MAX_THREADS].joinable()) m_threads[MAX_THREADS].join();
 }
 
 // the main worker loop, puts a thread to sleep and awakes when a job is here
@@ -71,10 +76,10 @@ void ThreadPool::worker_loop() {
 			// * Either the m_process queue is completely empty or,
 			// * the pool will not be receiving any more job
 			// * It should be noted that that wait() would release the lock
-			m_controller.wait(lock, [this] { return !m_processes.empty() || m_WorkComplete; });
+			m_controller.wait(lock, [this] { return !m_processes.empty() || m_WorkSent; });
 
 			// if no work is present AND none will ever come, return
-			if (m_processes.empty() && m_WorkComplete)
+			if (m_processes.empty() && m_WorkSent)
 				return;
 
 			// quickly move the job to a local IO Process struct
