@@ -1,4 +1,5 @@
 #include "threadpool.h"
+#include "utility.h"
 
 // creates MAX_THREADS number of threads and locks em in the worker_loop
 ThreadPool::ThreadPool() {
@@ -17,6 +18,7 @@ ThreadPool::ThreadPool() {
 			if (m_totalBytes) {
 				int percentage = ((double)(m_bytesCompleted.load()) / m_totalBytes) * 100;
 				std::cout << "\rProgress: " << percentage << "% " << std::flush;
+				g_progress.store(percentage);
 			}
 		}
 		std::cout << "\rProgress: 100% \n"

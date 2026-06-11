@@ -21,3 +21,6 @@ inline void throw_errno(const std::string& context = "") {
 
 // global var to indicate the cancel button has been pressed
 inline std::atomic<bool> g_cancel{false};
+
+// global var to signal progress to http
+inline std::atomic<int> g_progress {};
