@@ -1,0 +1,401 @@
+<!-- WRITTEN USING CLAUDE AS I SUCKKK AT UI-->
+<!-- MIGHT DO IT MYSELF IN THE FUTURE -->
+ 
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>ByteFlux</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500&display=swap"
+        rel="stylesheet" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            background: #000;
+            overflow: hidden
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0
+        }
+
+        .ui {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2.5rem;
+            padding: 2rem
+        }
+
+        .title {
+            font-family: 'Space Mono', monospace;
+            font-size: 5.5rem;
+            font-weight: 700;
+            letter-spacing: 0.35em;
+            color: #fff
+        }
+
+        .title span {
+            color: #00ffc8
+        }
+
+        .card {
+            background: rgba(0, 0, 0, 0.82);
+            border: 1px solid rgba(0, 255, 200, 0.25);
+            border-radius: 3px;
+            padding: 2.5rem;
+            width: 700px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem
+        }
+
+        .input-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem
+        }
+
+        .input-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.72rem;
+            color: #00ffc8;
+            letter-spacing: 0.18em
+        }
+
+        input[type=text] {
+            background: rgba(0, 255, 200, 0.05);
+            border: 1px solid rgba(0, 255, 200, 0.2);
+            border-radius: 2px;
+            padding: 1rem 1.2rem;
+            color: #e0fff8;
+            font-family: 'Space Mono', monospace;
+            font-size: 1rem;
+            width: 100%;
+            outline: none;
+            transition: border-color 0.2s
+        }
+
+        input[type=text]:focus {
+            border-color: #00ffc8
+        }
+
+        .radio-row {
+            display: flex;
+            gap: 2.5rem
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            cursor: pointer;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.95rem;
+            color: #555
+        }
+
+        input[type=radio] {
+            accent-color: #00ffc8;
+            width: 17px;
+            height: 17px
+        }
+
+        .radio-label:has(input:checked) {
+            color: #00ffc8
+        }
+
+        .flux-btn {
+            background: transparent;
+            border: 1px solid #00ffc8;
+            color: #00ffc8;
+            font-family: 'Space Mono', monospace;
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 0.35em;
+            padding: 1.1rem;
+            width: 100%;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: all 0.2s
+        }
+
+        .flux-btn:hover {
+            background: rgba(0, 255, 200, 0.08)
+        }
+
+        .flux-btn:active {
+            transform: scale(0.99)
+        }
+
+        .stage {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            width: 700px
+        }
+
+        .stage.active {
+            display: flex
+        }
+
+        .progress-num {
+            font-family: 'Space Mono', monospace;
+            font-size: 9rem;
+            font-weight: 700;
+            color: #00ffc8;
+            line-height: 1
+        }
+
+        .progress-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            color: rgba(0, 255, 200, 0.4);
+            letter-spacing: 0.25em
+        }
+
+        .status-icon {
+            font-size: 5rem;
+            line-height: 1
+        }
+
+        .log {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255, 80, 80, 0.3);
+            border-radius: 2px;
+            padding: 1.2rem;
+            max-height: 220px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem
+        }
+
+        .log-entry {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            color: #ff6060;
+            line-height: 1.6
+        }
+
+        .again-btn {
+            background: transparent;
+            border: 1px solid rgba(0, 255, 200, 0.35);
+            color: rgba(0, 255, 200, 0.6);
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            letter-spacing: 0.2em;
+            padding: 0.9rem 2.5rem;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: all 0.2s;
+            width: 100%
+        }
+
+        .again-btn:hover {
+            border-color: #00ffc8;
+            color: #00ffc8
+        }
+
+        .radio-row {
+            display: flex;
+            gap: 0;
+            width: 100%
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 0.9rem;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            cursor: pointer;
+            border: 1px solid rgba(0, 255, 200, 0.3);
+            background: transparent;
+            color: rgba(0, 255, 200, 0.4);
+            transition: all 0.2s
+        }
+
+        .mode-btn:first-child {
+            border-radius: 2px 0 0 2px
+        }
+
+        .mode-btn:last-child {
+            border-radius: 0 2px 2px 0;
+            border-left: none
+        }
+
+        .mode-btn.active {
+            background: rgba(0, 255, 200, 0.15);
+            color: #00ffc8;
+            border-color: #00ffc8
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="bg"></canvas>
+    <div class="ui">
+        <div class="title">BYTE<span>FLUX</span></div>
+
+        <div id="s1" class="stage active">
+            <div class="card">
+                <div class="input-wrap">
+                    <div class="input-label">SOURCE</div>
+                    <input type="text" id="src" placeholder="/home/user/documents" />
+                </div>
+                <div class="input-wrap">
+                    <div class="input-label">DESTINATION</div>
+                    <input type="text" id="dst" placeholder="/mnt/backup/documents" />
+                </div>
+                <div class="radio-row">
+                    <button class="mode-btn active" id="btn-copy" onclick="setMode('copy')">COPY</button>
+                    <button class="mode-btn" id="btn-move" onclick="setMode('move')">MOVE</button>
+                    <input type="radio" name="mode" value="copy" id="mode-input" style="display:none" checked />
+                </div>
+                <button class="flux-btn" onclick="goStage2()">— FLUX —</button>
+            </div>
+        </div>
+
+        <div id="s2" class="stage">
+            <div class="progress-num" id="pct">0%</div>
+            <div class="progress-label">TRANSFER IN PROGRESS</div>
+        </div>
+
+        <div id="s3" class="stage">
+            <div class="card" style="align-items:center;gap:1.5rem">
+                <div class="status-icon" id="icon"></div>
+                <div id="log" class="log" style="display:none"></div>
+                <button class="again-btn" onclick="goStage1()">↺ TRANSFER ANOTHER</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('bg');
+        const ctx = canvas.getContext('2d');
+        let lines = [];
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            lines = [];
+            // horizontal lines
+            const rowCount = 14;
+            const rowH = canvas.height / rowCount;
+            for (let i = 0; i < rowCount; i++) {
+                lines.push({
+                    type: 'h',
+                    y: rowH * i + rowH * 0.5,
+                    speed: (0.5 + Math.random() * 0.5) * (i % 2 === 0 ? 1 : -1),
+                    offset: Math.random() * 100,
+                    size: 24
+                });
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const t = Date.now() / 1000;
+
+            for (const L of lines) {
+                if (L.type === 'h') {
+                    ctx.font = `${L.size}px "Space Mono",monospace`;
+                    ctx.fillStyle = `rgba(0,255,200,0.12)`;
+                    const charW = L.size * 0.65;
+                    const shift = ((L.offset + t * L.speed * 35) % charW + charW) % charW;
+                    const count = Math.floor(canvas.width / charW) + 2;
+                    const startX = L.speed > 0 ? -charW + shift : -shift;
+                    for (let c = 0; c < count; c++) {
+                        ctx.fillText(c % 2 ? '1' : '0', startX + c * charW, L.y);
+                    }
+                } else {
+                    // angled line: draw along rotated axis
+                    ctx.save();
+                    ctx.translate(0, L.baseY);
+                    ctx.rotate(L.angle);
+                    ctx.font = `${L.size}px "Space Mono",monospace`;
+                    ctx.fillStyle = `rgba(0,255,200,${L.opacity})`;
+                    const charW = L.size * 0.65;
+                    const shift = ((L.offset + t * L.speed * 30) % charW + charW) % charW;
+                    const count = Math.floor((canvas.width * 1.5) / charW) + 2;
+                    const startX = L.speed > 0 ? -charW + shift : -shift;
+                    for (let c = 0; c < count; c++) {
+                        ctx.fillText(c % 2 ? '1' : '0', startX + c * charW, 0);
+                    }
+                    ctx.restore();
+                }
+            }
+            requestAnimationFrame(draw);
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+        draw();
+
+        function goStage2() {
+            document.getElementById('s1').classList.remove('active');
+            document.getElementById('s2').classList.add('active');
+            let p = 0;
+            const iv = setInterval(() => {
+                p = Math.min(p + Math.random() * 3, 100);
+                document.getElementById('pct').textContent = Math.floor(p) + '%';
+                if (p >= 100) { clearInterval(iv); setTimeout(() => goStage3(true, []), 600) }
+            }, 80);
+        }
+
+        function goStage3(success, errors) {
+            document.getElementById('s2').classList.remove('active');
+            document.getElementById('s3').classList.add('active');
+            const icon = document.getElementById('icon');
+            if (!success) { icon.textContent = '✗'; icon.style.color = '#ff4040'; }
+            else if (errors.length) { icon.textContent = '⚠'; icon.style.color = '#ffaa00'; }
+            else { icon.textContent = '✓'; icon.style.color = '#00ffc8'; }
+            if (errors.length) {
+                const log = document.getElementById('log');
+                log.style.display = 'flex';
+                log.innerHTML = errors.map(e => `<div class="log-entry">▸ ${e}</div>`).join('');
+            }
+        }
+
+        function goStage1() {
+            document.getElementById('s3').classList.remove('active');
+            document.getElementById('s1').classList.add('active');
+            document.getElementById('log').style.display = 'none';
+            document.getElementById('log').innerHTML = '';
+            document.getElementById('pct').textContent = '0%';
+        }
+
+        function setMode(m) {
+            document.getElementById('btn-copy').classList.toggle('active', m === 'copy');
+            document.getElementById('btn-move').classList.toggle('active', m === 'move');
+            document.getElementById('mode-input').value = m;
+        }
+    </script>
+</body>
+
+</html>
