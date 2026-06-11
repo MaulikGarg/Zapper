@@ -1,0 +1,247 @@
+/* WRITTEN USING CLAUDE AS I SUCKKK AT UI
+ MIGHT DO IT MYSELF IN THE FUTURE
+*/
+* {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            background: #000;
+            overflow: hidden
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0
+        }
+
+        .ui {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2.5rem;
+            padding: 2rem
+        }
+
+        .title {
+            font-family: 'Space Mono', monospace;
+            font-size: 5.5rem;
+            font-weight: 700;
+            letter-spacing: 0.35em;
+            color: #fff
+        }
+
+        .title span {
+            color: #00ffc8
+        }
+
+        .card {
+            background: rgba(0, 0, 0, 0.82);
+            border: 1px solid rgba(0, 255, 200, 0.25);
+            border-radius: 3px;
+            padding: 2.5rem;
+            width: 700px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem
+        }
+
+        .input-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem
+        }
+
+        .input-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.72rem;
+            color: #00ffc8;
+            letter-spacing: 0.18em
+        }
+
+        input[type=text] {
+            background: rgba(0, 255, 200, 0.05);
+            border: 1px solid rgba(0, 255, 200, 0.2);
+            border-radius: 2px;
+            padding: 1rem 1.2rem;
+            color: #e0fff8;
+            font-family: 'Space Mono', monospace;
+            font-size: 1rem;
+            width: 100%;
+            outline: none;
+            transition: border-color 0.2s
+        }
+
+        input[type=text]:focus {
+            border-color: #00ffc8
+        }
+
+        .radio-row {
+            display: flex;
+            gap: 2.5rem
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            cursor: pointer;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.95rem;
+            color: #555
+        }
+
+        input[type=radio] {
+            accent-color: #00ffc8;
+            width: 17px;
+            height: 17px
+        }
+
+        .radio-label:has(input:checked) {
+            color: #00ffc8
+        }
+
+        .flux-btn {
+            background: transparent;
+            border: 1px solid #00ffc8;
+            color: #00ffc8;
+            font-family: 'Space Mono', monospace;
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 0.35em;
+            padding: 1.1rem;
+            width: 100%;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: all 0.2s
+        }
+
+        .flux-btn:hover {
+            background: rgba(0, 255, 200, 0.08)
+        }
+
+        .flux-btn:active {
+            transform: scale(0.99)
+        }
+
+        .stage {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            width: 700px
+        }
+
+        .stage.active {
+            display: flex
+        }
+
+        .progress-num {
+            font-family: 'Space Mono', monospace;
+            font-size: 9rem;
+            font-weight: 700;
+            color: #00ffc8;
+            line-height: 1
+        }
+
+        .progress-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            color: rgba(0, 255, 200, 0.4);
+            letter-spacing: 0.25em
+        }
+
+        .status-icon {
+            font-size: 5rem;
+            line-height: 1
+        }
+
+        .log {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255, 80, 80, 0.3);
+            border-radius: 2px;
+            padding: 1.2rem;
+            max-height: 220px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem
+        }
+
+        .log-entry {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            color: #ff6060;
+            line-height: 1.6
+        }
+
+        .again-btn {
+            background: transparent;
+            border: 1px solid rgba(0, 255, 200, 0.35);
+            color: rgba(0, 255, 200, 0.6);
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            letter-spacing: 0.2em;
+            padding: 0.9rem 2.5rem;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: all 0.2s;
+            width: 100%
+        }
+
+        .again-btn:hover {
+            border-color: #00ffc8;
+            color: #00ffc8
+        }
+
+        .radio-row {
+            display: flex;
+            gap: 0;
+            width: 100%
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 0.9rem;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            cursor: pointer;
+            border: 1px solid rgba(0, 255, 200, 0.3);
+            background: transparent;
+            color: rgba(0, 255, 200, 0.4);
+            transition: all 0.2s
+        }
+
+        .mode-btn:first-child {
+            border-radius: 2px 0 0 2px
+        }
+
+        .mode-btn:last-child {
+            border-radius: 0 2px 2px 0;
+            border-left: none
+        }
+
+        .mode-btn.active {
+            background: rgba(0, 255, 200, 0.15);
+            color: #00ffc8;
+            border-color: #00ffc8
+        }
