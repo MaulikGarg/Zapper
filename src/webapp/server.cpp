@@ -5,7 +5,7 @@
 
 #include "../../external/httplib.h"
 
-bool try_launch_webapp() {
+bool work_in_webapp() {
 	httplib::Server svr;
 
 	// try to get a random port assigned

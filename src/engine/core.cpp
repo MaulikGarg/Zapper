@@ -1,6 +1,8 @@
 #include "core.h"
+#include "utility.h"
 
 ByteFluxResult run_byteflux(std::string src, std::string dst, e_process process) {
+	g_cancel = false; // reset global cancel
 	ByteFluxResult result;
 
 	// lambda to prepare the given string path

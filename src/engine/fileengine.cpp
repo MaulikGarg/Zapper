@@ -25,6 +25,8 @@ void copy_file_engine(IO_process& process) {
 		off_t src = 0, dst = 0;
 		ssize_t remaining = process.m_source_info.st_size;
 		while (remaining > 0) {
+			// if cancel is signal'd, drop immideatly
+			if(g_cancel.load()) throw std::runtime_error("Transfer cancelled.");
 			ssize_t copied = copy_file_range(process.get_source_fd(), &src, process.get_destination_fd(), &dst, remaining, 0);
 			if (copied < 0) {
 				if (errno == EINTR)
@@ -37,6 +39,8 @@ void copy_file_engine(IO_process& process) {
 		char buffer[max_read_size];
 
 		while (true) {
+			// if cancel is signal'd, drop immideatly
+			if(g_cancel.load()) throw std::runtime_error("Transfer cancelled.");
 			ssize_t readptr;
 
 			// read loop
@@ -83,6 +87,7 @@ void copy_directory_engine(IO_process& process, ThreadPool& pool) {
 
 	// iterate through all the directories and select current object as "src"
 	for (const fs::directory_entry& src : fs::directory_iterator(process.m_source)) {
+		 if(g_cancel.load()) return; // stop queuing new files
 		// the current src's IO Process
 		IO_process current;
 		current.m_source = src.path();

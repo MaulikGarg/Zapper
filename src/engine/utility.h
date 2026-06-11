@@ -6,6 +6,7 @@
 #include <string_view>
 #include <filesystem>
 #include <sys/stat.h>
+#include <atomic>
 
 // simple error message function
 inline void throw_error(const std::string& msg) {
@@ -17,3 +18,6 @@ inline void throw_errno(const std::string& context = "") {
 	std::string msg = context.empty() ? std::strerror(errno) : context + ": " + std::strerror(errno);
 	throw std::runtime_error(msg);
 }
+
+// global var to indicate the cancel button has been pressed
+inline std::atomic<bool> g_cancel{false};

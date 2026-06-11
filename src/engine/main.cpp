@@ -11,6 +11,10 @@ enum e_whichpath {
 void get_path(std::string& path, e_whichpath which);
 
 int main(int argc, char* argv[]) {
+
+	// if work done in webapp, exit 
+	if(work_in_webapp()) return 0;
+	// if false, do CLI
 	std::string src{}, dst{}, flag{};
 
 	std::cout << "Byteflux v0.6\n";
