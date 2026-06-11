@@ -1,8 +1,10 @@
 #include "core.h"
-#include "utility.h"
 
 ByteFluxResult run_byteflux(std::string src, std::string dst, e_process process) {
 	g_cancel = false; // reset global cancel
+	g_progress = 0; // reset global progress
+	g_byteflux_running = true; 
+
 	ByteFluxResult result;
 
 	// lambda to prepare the given string path
@@ -84,5 +86,6 @@ ByteFluxResult run_byteflux(std::string src, std::string dst, e_process process)
         result.fatal_error = e.what();
 	}
 
+	g_byteflux_running = false;
 	return result;
 }

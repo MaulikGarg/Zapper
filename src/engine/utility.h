@@ -1,12 +1,13 @@
 #pragma once
 
+#include <sys/stat.h>
+
+#include <atomic>
 #include <cerrno>
 #include <cstring>
+#include <filesystem>
 #include <stdexcept>
 #include <string_view>
-#include <filesystem>
-#include <sys/stat.h>
-#include <atomic>
 
 // simple error message function
 inline void throw_error(const std::string& msg) {
@@ -23,4 +24,14 @@ inline void throw_errno(const std::string& context = "") {
 inline std::atomic<bool> g_cancel{false};
 
 // global var to signal progress to http
-inline std::atomic<int> g_progress {};
+inline std::atomic<int> g_progress{};
+
+// global var to indicate byteflux is running
+inline std::atomic<bool> g_byteflux_running{false};
+
+// returns time since EPOCH in ms
+inline int64_t get_time() {
+	return std::chrono::duration_cast<std::chrono::milliseconds>(
+				  std::chrono::steady_clock::now().time_since_epoch())
+		 .count();
+}

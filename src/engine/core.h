@@ -1,6 +1,7 @@
 #pragma once
 
 #include "fileengine.h"
+#include "utility.h"
 
 enum class e_process {
 		copy,
