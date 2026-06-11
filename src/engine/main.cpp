@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "core.h"
+#include "../webapp/server.h"
 
 enum e_whichpath {
 	source,
