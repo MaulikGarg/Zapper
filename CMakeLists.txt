@@ -6,9 +6,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(byteflux
-    src/main.cpp
-    src/validator.cpp
-    src/fileengine.cpp
-    src/ioprocess.cpp
-    src/threadpool.cpp
+    src/engine/main.cpp
+    src/engine/validator.cpp
+    src/engine/fileengine.cpp
+    src/engine/ioprocess.cpp
+    src/engine/threadpool.cpp
 )
