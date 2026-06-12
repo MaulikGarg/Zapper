@@ -15,11 +15,7 @@ ThreadPool::ThreadPool() {
 		while (!m_WorkComplete) {
 			// updates every PROGRESS_UPDATE_INTERVAL seconds
 			std::this_thread::sleep_for(std::chrono::milliseconds(PROGRESS_UPDATE_INTERVAL));
-			if (g_total_bytes) {
-				int percentage = ((double)(g_bytes_completed.load()) / g_total_bytes.load()) * 100;
-				std::cout << "\rProgress: " << percentage << "% " << std::flush;
-				g_progress.store(percentage);
-			}
+			print_progress();
 		}
 		std::cout << "\rProgress: 100% \n"
 					 << std::flush;

@@ -21,6 +21,12 @@ async function onFlux() {
         const percent = await res.text();
         ui_set_progress(percent);
     }, PROGRESS_INTERVAL);
+    const speed_poll = setInterval(async () => {
+        const res = await fetch('/speed');
+        const bps = parseInt(await res.text());
+        const mbps = (bps / (1024 * 1024)).toFixed(1);
+        ui_set_speed(mbps);
+    }, 1000);
 
     const result = await fetch(`/transfer?src=${src}&dst=${dst}&mode=${mode}`, { method: 'POST' });
     const data = await result.json();
@@ -29,6 +35,7 @@ async function onFlux() {
 
     // after ui is changed, remove progress updating
     clearInterval(progress_poll);
+    clearInterval(speed_poll);
 }
 
 // if again is clicked set to ui stage 1

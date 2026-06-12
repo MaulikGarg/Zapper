@@ -3,11 +3,15 @@
 #include "utility.h"
 
 ByteFluxResult run_byteflux(std::string src, std::string dst, e_process process) {
-	g_cancel = false;	 // reset global cancel
-	g_progress = 0;	 // reset global progress
+	// reset all byteflux globals
+	g_cancel = false;	 
+	g_progress = 0;	 
 	g_byteflux_running = true;
 	g_total_bytes = 0;
 	g_bytes_completed = 0;
+	g_speed_bps = 0;
+	g_speed_last_time = get_time();
+	g_speed_last_bytes = 0;
 
 	ByteFluxResult result;
 

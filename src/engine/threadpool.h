@@ -13,7 +13,6 @@
 #include <chrono>
 
 constexpr int MAX_THREADS =  8;
-constexpr int PROGRESS_UPDATE_INTERVAL = 50; // in ms
 
 void copy_file_engine(IO_process &process);
 

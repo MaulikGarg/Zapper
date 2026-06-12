@@ -55,6 +55,7 @@ function ui_stage1() {
     document.getElementById('log').style.display = 'none';
     document.getElementById('log').innerHTML = '';
     document.getElementById('pct').textContent = '0%';
+    document.getElementById('speed').textContent = '0 MB/s';
 }
 
 function ui_stage2() {
@@ -88,4 +89,8 @@ function ui_stage3(success, fatal_error, file_errors) {
 
 function ui_set_progress(pct) {
     document.getElementById('pct').textContent = pct + '%';
+}
+
+function ui_set_speed(mbps) {
+    document.getElementById('speed').textContent = mbps + ' MB/s';
 }

@@ -52,6 +52,9 @@ void register_static_routes(httplib::Server& svr) {
 	svr.Get("/byteflux.js", [](const httplib::Request&, httplib::Response& res) {
 		res.set_content((const char*)byteflux_js, "text/javascript");
 	});
+	svr.Get("/speed", [](const httplib::Request&, httplib::Response& res) {
+		res.set_content(std::to_string(g_speed_bps.load()), "text/plain");
+	});
 }
 
 void register_api_routes(httplib::Server& svr, std::atomic<bool>& shutdown, std::atomic<int64_t>& last_heartbeat) {
