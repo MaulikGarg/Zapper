@@ -17,3 +17,4 @@ bool work_in_webapp();
 
 // sets up the http server on a random port
 bool open_webapp(httplib::Server& svr, int& port, std::thread& serverthread);
+

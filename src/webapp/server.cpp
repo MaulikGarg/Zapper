@@ -1,6 +1,20 @@
 #include "server.h"
 using json = nlohmann::json;
 
+// webpage files
+static const unsigned char index_html[] = {
+#embed "../webapp/index.html"
+	 , '\0'};
+static const unsigned char styles_css[] = {
+#embed "../webapp/styles.css"
+	 , '\0'};
+static const unsigned char styles_js[] = {
+#embed "../webapp/styles.js"
+	 , '\0'};
+static const unsigned char byteflux_js[] = {
+#embed "../webapp/byteflux.js"
+	 , '\0'};
+
 bool open_webapp(httplib::Server& svr, int& port, std::thread& serverthread) {
 	// try to get a random port assigned
 	port = svr.bind_to_any_port("localhost");
@@ -25,26 +39,23 @@ bool open_webapp(httplib::Server& svr, int& port, std::thread& serverthread) {
 	return true;
 }
 
-bool work_in_webapp() {
-	httplib::Server svr;
-	int port{};
-	std::thread listener;
-	std::atomic<bool> shutdown{false};
-	std::atomic<int64_t> last_heartbeat{get_time()};
+void register_static_routes(httplib::Server& svr) {
+	svr.Get("/", [](const httplib::Request&, httplib::Response& res) {
+		res.set_content((const char*)index_html, "text/html");
+	});
+	svr.Get("/styles.css", [](const httplib::Request&, httplib::Response& res) {
+		res.set_content((const char*)styles_css, "text/css");
+	});
+	svr.Get("/styles.js", [](const httplib::Request&, httplib::Response& res) {
+		res.set_content((const char*)styles_js, "text/javascript");
+	});
+	svr.Get("/byteflux.js", [](const httplib::Request&, httplib::Response& res) {
+		res.set_content((const char*)byteflux_js, "text/javascript");
+	});
+}
 
-	auto heartbeat = [&](const httplib::Request&, httplib::Response&) {
-		last_heartbeat = get_time();
-	};
-
-	auto quit = [&](const httplib::Request&, httplib::Response&) {
-		shutdown.store(true);
-	};
-
-	auto progress = [](const httplib::Request&, httplib::Response& res) {
-		// send progress percentage
-		res.set_content(std::to_string(g_progress.load()), "text/plain");
-	};
-
+void register_api_routes(httplib::Server& svr, std::atomic<bool>& shutdown, std::atomic<int64_t>& last_heartbeat) {
+	// calls byteflux from webpage data and sends back result
 	auto transfer = [](const httplib::Request& req, httplib::Response& res) {
 		std::string source = req.get_param_value("src");
 		std::string destination = req.get_param_value("dst");
@@ -58,10 +69,37 @@ bool work_in_webapp() {
 		res.set_content(json_result.dump(), "application/json");
 	};
 
+	// updates heartbeat time whenever the webpage beats
+	auto heartbeat = [&](const httplib::Request&, httplib::Response&) {
+		last_heartbeat = get_time();
+	};
+
+	// sets shutdown var to true which initiates shutdown sequence
+	auto quit = [&](const httplib::Request&, httplib::Response&) {
+		shutdown.store(true);
+	};
+
+	// sends progress report to webpage
+	auto progress = [](const httplib::Request&, httplib::Response& res) {
+		// send progress percentage
+		res.set_content(std::to_string(g_progress.load()), "text/plain");
+	};
+
 	svr.Get("/heartbeat", heartbeat);
 	svr.Get("/quit", quit);
 	svr.Get("/progress", progress);
 	svr.Post("/transfer", transfer);
+}
+
+bool work_in_webapp() {
+	httplib::Server svr;
+	int port{};
+	std::thread listener;
+	std::atomic<bool> shutdown{false};
+	std::atomic<int64_t> last_heartbeat{get_time()};
+
+	register_static_routes(svr);
+	register_api_routes(svr, shutdown, last_heartbeat);
 
 	if (!open_webapp(svr, port, listener))
 		return false;

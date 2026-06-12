@@ -3,17 +3,14 @@
 
 <!DOCTYPE html>
 <html>
-
 <head>
     <meta charset="UTF-8">
     <title>ByteFlux</title>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500&display=swap"
-        rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="styles.css"/>
     <script src="styles.js" defer></script>
     <script src="byteflux.js" defer></script>
 </head>
-
 <body>
     <canvas id="bg"></canvas>
     <div class="ui">
@@ -23,18 +20,18 @@
             <div class="card">
                 <div class="input-wrap">
                     <div class="input-label">SOURCE</div>
-                    <input type="text" id="src" placeholder="/home/user/documents" />
+                    <input type="text" id="src" autocomplete="off" placeholder="/home/user/documents"/>
                 </div>
                 <div class="input-wrap">
                     <div class="input-label">DESTINATION</div>
-                    <input type="text" id="dst" placeholder="/mnt/backup/documents" />
+                    <input type="text" id="dst" autocomplete="off" placeholder="/mnt/backup/documents"/>
                 </div>
                 <div class="radio-row">
                     <button class="mode-btn active" id="btn-copy" onclick="setMode('copy')">COPY</button>
                     <button class="mode-btn" id="btn-move" onclick="setMode('move')">MOVE</button>
-                    <input type="radio" name="mode" value="copy" id="mode-input" style="display:none" checked />
+                    <input type="radio" name="mode" value="copy" id="mode-input" style="display:none" checked/>
                 </div>
-                <button class="flux-btn" onclick="goStage2()">— FLUX —</button>
+                <button class="flux-btn" id="flux-btn">— FLUX —</button>
             </div>
         </div>
 
@@ -47,10 +44,9 @@
             <div class="card" style="align-items:center;gap:1.5rem">
                 <div class="status-icon" id="icon"></div>
                 <div id="log" class="log" style="display:none"></div>
-                <button class="again-btn" onclick="goStage1()">↺ TRANSFER ANOTHER</button>
+                <button class="again-btn" id="again-btn">↺ TRANSFER ANOTHER</button>
             </div>
         </div>
     </div>
 </body>
-
 </html>
