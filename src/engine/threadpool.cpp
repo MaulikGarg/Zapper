@@ -15,8 +15,8 @@ ThreadPool::ThreadPool() {
 		while (!m_WorkComplete) {
 			// updates every PROGRESS_UPDATE_INTERVAL seconds
 			std::this_thread::sleep_for(std::chrono::milliseconds(PROGRESS_UPDATE_INTERVAL));
-			if (m_totalBytes) {
-				int percentage = ((double)(m_bytesCompleted.load()) / m_totalBytes) * 100;
+			if (g_total_bytes) {
+				int percentage = ((double)(g_bytes_completed.load()) / g_total_bytes.load()) * 100;
 				std::cout << "\rProgress: " << percentage << "% " << std::flush;
 				g_progress.store(percentage);
 			}
@@ -92,8 +92,6 @@ void ThreadPool::worker_loop() {
 		// TRY to copy the given file
 		try {
 			copy_file_engine(job);
-			// we use memory order relaxed as addition order does not matter
-			m_bytesCompleted.fetch_add(job.m_source_info.st_size, std::memory_order_relaxed);
 		}
 		// If any error is thrown, store it in the errors vector and WE CONTINUE!
 		catch (std::exception& e) {

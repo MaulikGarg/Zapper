@@ -35,3 +35,12 @@ inline int64_t get_time() {
 				  std::chrono::steady_clock::now().time_since_epoch())
 		 .count();
 }
+
+// byte count for progress
+inline std::atomic<uint64_t> g_bytes_completed{0};
+inline std::atomic<uint64_t> g_total_bytes{0};
+
+// add n bytes to bytesfinished
+inline void add_bytes_completed(uint64_t bytes){
+    g_bytes_completed.fetch_add(bytes, std::memory_order_relaxed);
+}

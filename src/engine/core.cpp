@@ -1,16 +1,20 @@
 #include "core.h"
 
+#include "utility.h"
+
 ByteFluxResult run_byteflux(std::string src, std::string dst, e_process process) {
-	g_cancel = false; // reset global cancel
-	g_progress = 0; // reset global progress
-	g_byteflux_running = true; 
+	g_cancel = false;	 // reset global cancel
+	g_progress = 0;	 // reset global progress
+	g_byteflux_running = true;
+	g_total_bytes = 0;
+	g_bytes_completed = 0;
 
 	ByteFluxResult result;
 
 	// lambda to prepare the given string path
 	auto pathify_string = [](std::string path) {
 		auto start = path.find_first_not_of(" \t");
-		auto end = path.find_last_not_of(" \t");
+		auto end = path.find_last_not_of(" \t/");
 		path = (start == std::string::npos) ? "" : path.substr(start, end - start + 1);
 		return std::filesystem::path(path).lexically_normal();
 	};
@@ -27,6 +31,7 @@ ByteFluxResult run_byteflux(std::string src, std::string dst, e_process process)
 		// if the source is a regular file
 		if (S_ISREG(mainprocess.m_source_info.st_mode)) {
 			resolve_destination_file(mainprocess);
+			g_total_bytes = mainprocess.m_source_info.st_size;
 			if (process == e_process::copy)
 				copy_file_engine(mainprocess);
 			else if (process == e_process::move)
@@ -40,13 +45,13 @@ ByteFluxResult run_byteflux(std::string src, std::string dst, e_process process)
 
 			if (process == e_process::copy) {
 				// set total bytes to be transferred
-				mainpool.set_total_bytes(calculate_total_bytes(mainprocess.m_source));
+				g_total_bytes = calculate_total_bytes(mainprocess.m_source);
 				copy_directory_engine(mainprocess, mainpool);
 
 			} else if (process == e_process::move) {
 				// if the move is to a different device, calculates bytes to be moved
 				if (!mainprocess.m_same_device)
-					mainpool.set_total_bytes(calculate_total_bytes(mainprocess.m_source));
+					g_total_bytes = calculate_total_bytes(mainprocess.m_source);
 				move_directory_engine(mainprocess, mainpool);
 			}
 
@@ -76,14 +81,14 @@ ByteFluxResult run_byteflux(std::string src, std::string dst, e_process process)
 			}
 		}
 		// if the source is not a file or a directory
-		else{
+		else {
 			throw_error("Unsupported format.");
 		}
-		result.m_success = true; // byteflux has reached end
+		result.m_success = true;  // byteflux has reached end
 
 	} catch (std::exception& e) {
 		result.m_success = false;
-        result.fatal_error = e.what();
+		result.fatal_error = e.what();
 	}
 
 	g_byteflux_running = false;

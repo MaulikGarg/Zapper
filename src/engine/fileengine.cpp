@@ -1,4 +1,5 @@
 #include "fileengine.h"
+#include "utility.h"
 
 namespace fs = std::filesystem;
 
@@ -25,6 +26,7 @@ void copy_file_engine(IO_process& process) {
 				throw_errno(context + ", for " + process.m_source.c_str() + " to " + process.m_destination.c_str());
 			}
 			remaining -= copied;
+			add_bytes_completed(copied); // update prpgress on completion
 		}
 	} else {
 		char buffer[max_read_size];
@@ -57,6 +59,7 @@ void copy_file_engine(IO_process& process) {
 
 				if (result > 0) {
 					bytes_written += result;
+					add_bytes_completed(result); // update byte progress
 					continue;
 				}
 
