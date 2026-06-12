@@ -59,7 +59,8 @@ void register_api_routes(httplib::Server& svr, std::atomic<bool>& shutdown, std:
 	auto transfer = [](const httplib::Request& req, httplib::Response& res) {
 		std::string source = req.get_param_value("src");
 		std::string destination = req.get_param_value("dst");
-		e_process mode = req.get_param_value("mode") == "c" ? e_process::copy : e_process::move;
+		// if sent mode is copy then eproc copy otherwise move
+		e_process mode = req.get_param_value("mode") == "copy" ? e_process::copy : e_process::move;
 		ByteFluxResult result = run_byteflux(source, destination, mode);
 
 		json json_result;

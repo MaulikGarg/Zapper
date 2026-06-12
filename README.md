@@ -14,9 +14,10 @@ This is a student project.
 
 ## Current Features
 
+- Webapp UI (fallback to CLI if failure)
 - Prevents accidental overwrites
 - Copies a single file
-- Copies directories in a 8 threads
+- Copies directories in a sys/2 threads
 - Symlink prevention
 - Shows errors at directory transfer end 
 - Moves files/directories
