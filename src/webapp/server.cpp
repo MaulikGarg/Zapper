@@ -1,4 +1,5 @@
 #include "server.h"
+#include <string>
 using json = nlohmann::json;
 
 // webpage files
@@ -52,9 +53,6 @@ void register_static_routes(httplib::Server& svr) {
 	svr.Get("/byteflux.js", [](const httplib::Request&, httplib::Response& res) {
 		res.set_content((const char*)byteflux_js, "text/javascript");
 	});
-	svr.Get("/speed", [](const httplib::Request&, httplib::Response& res) {
-		res.set_content(std::to_string(g_speed_bps.load()), "text/plain");
-	});
 }
 
 void register_api_routes(httplib::Server& svr, std::atomic<bool>& shutdown, std::atomic<int64_t>& last_heartbeat) {
@@ -67,9 +65,9 @@ void register_api_routes(httplib::Server& svr, std::atomic<bool>& shutdown, std:
 		ByteFluxResult result = run_byteflux(source, destination, mode);
 
 		json json_result;
-		json_result["success"] = result.m_success;
-		json_result["fatal_error"] = result.fatal_error;
-		json_result["file_errors"] = result.file_errors;  // nlohmann handles vectors natively
+		json_result["j_success"] = result.m_success;
+		json_result["j_fatal_error"] = result.fatal_error;
+		json_result["j_file_errors"] = result.file_errors;  // nlohmann handles vectors natively
 		res.set_content(json_result.dump(), "application/json");
 	};
 
@@ -85,8 +83,12 @@ void register_api_routes(httplib::Server& svr, std::atomic<bool>& shutdown, std:
 
 	// sends progress report to webpage
 	auto progress = [](const httplib::Request&, httplib::Response& res) {
-		// send progress percentage
-		res.set_content(std::to_string(g_progress.load()), "text/plain");
+		json json_progress;
+		json_progress["j_percent"] = std::to_string(g_progress.load());
+		json_progress["j_speed_bps"] = std::to_string(g_speed_bps.load());
+		json_progress["j_time_remaining_s"] = std::to_string(g_time_remaining.load()); 
+		
+		res.set_content(json_progress.dump(),"application/json");
 	};
 
 	svr.Get("/heartbeat", heartbeat);

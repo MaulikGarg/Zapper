@@ -1,7 +1,3 @@
-/* WRITTEN USING CLAUDE AS I SUCKKK AT UI
-   MIGHT DO IT MYSELF IN THE FUTURE
-*/
-
 const canvas = document.getElementById('bg');
 const ctx = canvas.getContext('2d');
 let lines = [];
@@ -87,10 +83,8 @@ function ui_stage3(success, fatal_error, file_errors) {
     }
 }
 
-function ui_set_progress(pct) {
+function ui_set_progress(pct, mbps, timerem_string) {
     document.getElementById('pct').textContent = pct + '%';
-}
-
-function ui_set_speed(mbps) {
     document.getElementById('speed').textContent = mbps + ' MB/s';
+    document.getElementById('timeleft').textContent = timerem_string;
 }

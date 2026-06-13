@@ -12,7 +12,7 @@
 #include <iostream>
 #include <chrono>
 
-constexpr int MAX_THREADS =  8;
+const int MAX_THREADS = std::thread::hardware_concurrency() > 0 ? std::thread::hardware_concurrency() :2;
 
 void copy_file_engine(IO_process &process);
 
